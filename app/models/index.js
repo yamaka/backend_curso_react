@@ -22,6 +22,9 @@ db.sequelize = sequelize;
 db.cursos = require("./cursos.model.js")(sequelize, Sequelize);
 db.user = require("./user.model.js")(sequelize, Sequelize);
 db.role = require("./role.model.js")(sequelize, Sequelize);
+db.carrito = require("./carrito.model.js")(sequelize, Sequelize);
+
+
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",
@@ -32,6 +35,20 @@ db.user.belongsToMany(db.role, {
   through: "user_roles",
   foreignKey: "userId",
   otherKey: "roleId",
+});
+
+db.user.hasOne(db.carrito);
+db.carrito.belongsTo(db.user);
+
+db.carrito.belongsToMany(db.cursos, {
+  through: "carrito_cursos",
+  foreignKey: "carritoId",
+  otherKey: "cursoId",
+});
+db.cursos.belongsToMany(db.carrito, {
+  through: "carrito_cursos",
+  foreignKey: "cursoId",
+  otherKey: "carritoId",
 });
 
 db.ROLES = ["user", "admin", "moderator"];
