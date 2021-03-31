@@ -37,9 +37,12 @@ db.user.belongsToMany(db.role, {
   otherKey: "roleId",
 });
 
+//un carrito es para un usuario solamente
 db.user.hasOne(db.carrito);
 db.carrito.belongsTo(db.user);
 
+
+//carrito tiene varios cursos, y un curso esta en varios carritos
 db.carrito.belongsToMany(db.cursos, {
   through: "carrito_cursos",
   foreignKey: "carritoId",

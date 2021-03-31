@@ -51,16 +51,18 @@ exports.signin = (req, res) => {
         return res.status(404).send({ message: "User Not found." });
       }
 
-      var passwordIsValid = bcrypt.compareSync(
-        req.body.password,
-        user.password
-      );
+      if(!req.body.fromGoogle){
+        var passwordIsValid = bcrypt.compareSync(
+          req.body.password,
+          user.password
+        );
 
-      if (!passwordIsValid) {
-        return res.status(401).send({
-          accessToken: null,
-          message: "Invalid Password!",
-        });
+        if (!passwordIsValid) {
+          return res.status(401).send({
+            accessToken: null,
+            message: "Invalid Password!",
+          });
+        }
       }
 
       var token = jwt.sign({ id: user.id }, config.secret, {
