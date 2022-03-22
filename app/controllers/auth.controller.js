@@ -2,6 +2,7 @@ const db = require("../models");
 const config = require("../config/auth.config");
 const User = db.user;
 const Role = db.role;
+const Carrito = db.carrito;
 
 const Op = db.Sequelize.Op;
 
@@ -34,6 +35,21 @@ exports.signup = (req, res) => {
           res.send({ message: "User was registered successfully!" });
         });
       }
+      // Save carrito in the database
+      const carrito = {
+        userId: user.id,
+      };
+      Carrito.create(carrito)
+        .then(carritoDB => {
+          user.setCarrito(carritoDB);
+          res.send(carritoDB);
+        })
+        .catch(err => {
+          res.status(500).send({
+            message:
+              err.message || "Some error occurred while creating the carrito."
+          });
+        });
     })
     .catch((err) => {
       res.status(500).send({ message: err.message });
@@ -74,13 +90,29 @@ exports.signin = (req, res) => {
         for (let i = 0; i < roles.length; i++) {
           authorities.push("ROLE_" + roles[i].name.toUpperCase());
         }
-        res.status(200).send({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          roles: authorities,
-          accessToken: token,
-        });
+
+        Carrito.findAll({
+          limit: 1,
+          where: {
+            //your where conditions, or without them if you need ANY entry
+            userId: user.id
+          },
+          order: [['createdAt', 'DESC']]
+        }).then(function (carritos) {
+  
+          //only difference is that you get users list limited to 1
+          if(carritos.length > 0){
+            res.status(200).send({
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              roles: authorities,
+              carrito: carritos[0],
+              accessToken: token,
+            });
+          }
+        })
+        
       });
     })
     .catch((err) => {

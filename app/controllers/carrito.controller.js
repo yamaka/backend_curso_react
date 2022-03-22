@@ -9,7 +9,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new carrito
 exports.create = (req, res) => {
   
-  // Create a curso
+  // Create a carrito
 
   User.findByPk(req.body.userId)
     .then(userDB => {
